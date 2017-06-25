@@ -1,4 +1,4 @@
 language: clojure
 
-script: lein doo node test
+script: lein doo node test once
 
