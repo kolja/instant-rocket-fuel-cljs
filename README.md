@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/kolja/instant-rocket-fuel-cljs.svg?branch=master)](https://travis-ci.org/kolja/instant-rocket-fuel-cljs)
+
 # Instant Rocket Fuel for ClojureScript
 
 This is a work in progress of porting [Instant Rocket Fuel](https://github.com/kolja/Instant-Rocket-Fuel) to ClojureScript (see the orginal irf's [documentation](http://kolja.github.io/Instant-Rocket-Fuel/)).
