@@ -4,7 +4,9 @@
 
 (enable-console-print!)
 
-;; helper fn
+;; helper
+(def abs js/Math.abs)
+
 (defn rad-to-deg [rad]
   (let [pi (.-PI js/Math)]
     (js/parseFloat
@@ -12,9 +14,13 @@
         (* rad (/ 360 (* 2 pi)))
         2))))
 
-(testing "sanity"
-  (deftest sanity-check
-    (is (= 1 1))))
+(testing "almost equal"
+  (deftest almost-equal
+    (is (= (v/almost= 100 101) false))
+    (is (v/almost= 1))
+    (is (v/almost= 1 1))
+    (is (v/almost= 1 1 1.0000001))
+    (is (v/almost= 10000001 10000002))))
 
 (testing "addition"
   (deftest add
@@ -75,4 +81,13 @@
            11.89))
     (is (= (rad-to-deg (v/angle [3 7] [1 5]))
            11.89))))
+
+(testing "projection"
+  (deftest project
+    (is (v/v= (v/project [-1 5] [4 6])
+           [2 3]))
+    (is (= (v/collinear?
+             (v/project [1 2] [-1 -5])
+             [-1 -5])
+           true))))
 

@@ -4,6 +4,17 @@
 ;Created by Kolja Wilcke in June 2017
 
 (defn sqr [x] (js/Math.pow x 2))
+(def abs js/Math.abs)
+
+(defn almost= [& args]
+  (let [mx (apply max args)
+        mn (apply min args)
+        e (/ (max (abs mn) (abs mx)) 1000000)]
+    (< (- mx mn) e)))
+
+(defn v= [& args]
+  (and (apply almost= (map first args))
+       (apply almost= (map second args))))
 
 (defn add [& args]
   "Add Vectors"
@@ -49,8 +60,8 @@
 
 (defn collinear? [& args]
     "determines if the given vectors are collinear"
-    (let [without-null (filter #(not= % [0 0]) args)] ;; Null-Vectors are collinear with everything. Just ignore them.
-      (apply = (map (fn [[x y]] (/ x y)) without-null))))
+    (let [without-null (remove #(= % [0 0]) args)] ;; Null-Vectors are collinear with everything. Just ignore them.
+      (apply almost= (map (fn [[x y]] (/ x y)) without-null))))
 
 (defn angle [v1 v2]
     "returns the angle enclosed by two vectors in radians"
@@ -60,11 +71,10 @@
 
 ; Vector/Kreuzprodukt only exists for 3d Space by definition
 
-(defn projectTo [v1 v2]
+(defn project [v1 v2]
     "returns the component parallel to a given vector"
-    (mult (/ (scalarProduct v1 v2)
-             lengthSquared(v2))
-          v2))
+    (let [u (norm v2)]
+      (mult u (dot v1 u))))
 
 
 (defn intersecting [oa, a, ob, b]
