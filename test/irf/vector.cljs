@@ -1,18 +1,9 @@
 (ns test.irf.vector
   (:require [cljs.test :refer-macros [deftest is testing run-tests]]
-            [irf.vector :as v]))
+            [irf.vector :as v]
+            [irf.util :as util]))
 
 (enable-console-print!)
-
-;; helper
-(def abs js/Math.abs)
-
-(defn rad-to-deg [rad]
-  (let [pi (.-PI js/Math)]
-    (js/parseFloat
-      (.toFixed
-        (* rad (/ 360 (* 2 pi)))
-        2))))
 
 (testing "vector creation"
   (deftest new-vector
@@ -92,25 +83,25 @@
 
 (testing "angle between two vectors"
   (deftest angle
-    (is (= (rad-to-deg (v/angle (v/v 0 1) (v/v 1 0)))
+    (is (= (util/rad-to-deg (v/angle (v/v 0 1) (v/v 1 0)))
            90))
-    (is (= (rad-to-deg (v/angle (v/v 1 1) (v/v 1 0)))
+    (is (= (util/rad-to-deg (v/angle (v/v 1 1) (v/v 1 0)))
            45))
-    (is (= (rad-to-deg (v/angle (v/v 1 0) (v/v 1 1)))
+    (is (= (util/rad-to-deg (v/angle (v/v 1 0) (v/v 1 1)))
            (- 360 45) 315))
-    (is (= (rad-to-deg (v/angle (v/v 1 1) (v/v 1 -1)))
+    (is (= (util/rad-to-deg (v/angle (v/v 1 1) (v/v 1 -1)))
            90))
-    (is (= (rad-to-deg (v/angle (v/v 1 1) (v/v -1 -1)))
+    (is (= (util/rad-to-deg (v/angle (v/v 1 1) (v/v -1 -1)))
            180))
-    (is (= (rad-to-deg (v/angle (v/v 1 -1) (v/v 1 1)))
+    (is (= (util/rad-to-deg (v/angle (v/v 1 -1) (v/v 1 1)))
            270))
-    (is (= (rad-to-deg (v/angle (v/v -1 1) (v/v 1 1)))
+    (is (= (util/rad-to-deg (v/angle (v/v -1 1) (v/v 1 1)))
            90))
-    (is (= (rad-to-deg (v/angle (v/v 1 1) (v/v -1 1)))
+    (is (= (util/rad-to-deg (v/angle (v/v 1 1) (v/v -1 1)))
            (- 360 90)))
-    (is (= (rad-to-deg (v/angle (v/v 1 5) (v/v 3 7)))
+    (is (= (util/rad-to-deg (v/angle (v/v 1 5) (v/v 3 7)))
            11.89))
-    (is (= (rad-to-deg (v/angle (v/v 3 7) (v/v 1 5)))
+    (is (= (util/rad-to-deg (v/angle (v/v 3 7) (v/v 1 5)))
            (- 360 11.89)))))
 
 (testing "projection"
