@@ -1,21 +1,27 @@
 (ns irf.vector)
 
 ;vector.cljs
-;Created by Kolja Wilcke in June 2017
+;by Kolja Wilcke in June 2017
+
+(defn v [x y]
+  "create a new Vector with x and y components"
+  {:x x :y y})
 
 (defn sqr [x] (js/Math.pow x 2))
 (def abs js/Math.abs)
 (def atan2 js/Math.atan2)
 (def pi (.-PI js/Math))
+(def v0 (v 0 0)) ;; null-vektor
 
-(defn quadrant [[x y]]
+(defn quadrant [{:keys [x y]}]
+  "which quadrant does a vektor point to"
   (case [(pos? x) (pos? y)]
     [true true] 1
     [true false] 2
     [false false] 3
     [false true] 4))
 
-(defn pitch [[x y]]
+(defn pitch [{:keys [x y]}]
   "pitch angle (aka angle of climb/slope)"
   (/ y x))
 
@@ -28,55 +34,61 @@
 
 (defn v= [& args]
   "approximate equality for vectors"
-  (and (apply almost= (map first args))
-       (apply almost= (map second args))))
+  (and (apply almost= (map :x args))
+       (apply almost= (map :y args))))
+
+(defn v== [& args]
+  "strict equality for vectors"
+  (and (apply = (map :x args))
+       (apply = (map :y args))))
 
 (defn add [& args]
   "Add Vectors"
-  (reduce (fn [[ax ay] [acc-x acc-y]]
-            [(+ ax acc-x) (+ ay acc-y)])
+  (reduce (fn [{x :x y :y} {acc-x :x acc-y :y}]
+            {:x (+ x acc-x)
+             :y (+ y acc-y)})
           args))
 
-(defn subtract [[ax ay] & args]
+(defn subtract [{ax :x ay :y} & args]
   "Subtract Vectors"
-  (let [[bx by] (apply add args)]
-    [(- ax bx)
-     (- ay by)]))
+  (let [{bx :x by :y} (apply add args)]
+    {:x (- ax bx)
+     :y (- ay by)}))
 
-(defn mult [[ax ay] n]
+(defn mult [{:keys [x y]} n]
   "multiply the vector with a Number"
-  [(* n ax)
-   (* n ay)])
+  {:x (* n x)
+   :y (* n y)})
 
-(defn div [[ax ay] n]
+(defn div [{:keys [x y]} n]
     "divide the vector with a Number"
-   [(/ ax n)
-    (/ ay n)])
+    {:x (/ x n)
+     :y (/ y n)})
 
-(defn length-squared [[vx vy]]
+(defn length-squared [{:keys [x y]}]
     "return the length squared (for optimisation)"
-    (+ (sqr vx)
-       (sqr vy)))
+    (+ (sqr x)
+       (sqr y)))
 
-(defn length [v]
+(defn length [a]
     "returns the length of the vector (Betrag)"
-    (.sqrt js/Math (length-squared v)))
+    (.sqrt js/Math (length-squared a)))
 
-(defn norm [v]
+(defn norm [a]
     "returns the normalized vector (Length = 1)"
-    (if (= v [0 0])
-      [0 0]
-      (div v (length v))))
+    (if (v== a v0)
+      a
+      (div a (length a))))
 
-(defn dot [[ax ay] [bx by]]
+(defn dot [{ax :x ay :y} {bx :x by :y}]
     "calculate the dot product or scalar product of two vectors"
     (+ (* ax bx)
        (* ay by)))
 
 (defn collinear? [& args]
     "determines if the given vectors are collinear"
-    (let [without-null (remove #(= % [0 0]) args)] ;; Null-Vectors are collinear with everything. Just ignore them.
-      (apply almost= (map (fn [[x y]] (/ x y)) without-null))))
+    (let [without-null (remove #(v== % v0) args)] ;; Null-Vectors are collinear with everything. Just ignore them.
+      (apply almost= (map (fn [{:keys [x y]}] (/ x y)) without-null))))
 
 ;; ;; this will always return the smallest possible angle
 ;; (defn angle [v1 v2]
@@ -85,7 +97,7 @@
 ;;                       (* (length v1)
 ;;                          (length v2)))))
 
-(defn angle [[ax ay] [bx by]]
+(defn angle [{ax :x ay :y} {bx :x by :y}]
   "angle between two vectors in clockwise direction"
   (let [t (- (atan2 ay ax)
              (atan2 by bx))
@@ -99,16 +111,12 @@
     (let [u (norm v2)]
       (mult u (dot v1 u))))
 
-
-(defn intersecting [oa, a, ob, b]
+(defn intersect [oa {ax :x ay :y} ob b]
     "Class method: checks if two vectors are intersecting - returns intersection point"
-    (let [c (subtract ob oa)
-          -b  (mult b -1)
-          col [a -b c]
-          m (/ (a :y) (a :x))
-          mu (/ (- (c :y) (* m (c :x)))
-                (- (-b :y) (* m (-b :x))))
-          ]
-      (subtract ob
-                (mult -b mu))))
+    (let [{cx :x cy :y}   (subtract ob oa)
+          {-bx :x -by :y :as -b} (mult b -1)
+          m (/ ay ax)
+          mu (/ (- cy (* m cx))
+                (- -by (* m -bx)))]
+      (subtract ob (mult -b mu))))
 
