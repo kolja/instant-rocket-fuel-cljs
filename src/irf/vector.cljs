@@ -5,14 +5,29 @@
 
 (defn sqr [x] (js/Math.pow x 2))
 (def abs js/Math.abs)
+(def atan2 js/Math.atan2)
+(def pi (.-PI js/Math))
+
+(defn quadrant [[x y]]
+  (case [(pos? x) (pos? y)]
+    [true true] 1
+    [true false] 2
+    [false false] 3
+    [false true] 4))
+
+(defn pitch [[x y]]
+  "pitch angle (aka angle of climb/slope)"
+  (/ y x))
 
 (defn almost= [& args]
+  "approximate equality for numbers"
   (let [mx (apply max args)
         mn (apply min args)
-        e (/ (max (abs mn) (abs mx)) 1000000)]
+        e (/ (max (abs mn) (abs mx)) 1e10)]
     (< (- mx mn) e)))
 
 (defn v= [& args]
+  "approximate equality for vectors"
   (and (apply almost= (map first args))
        (apply almost= (map second args))))
 
@@ -63,11 +78,19 @@
     (let [without-null (remove #(= % [0 0]) args)] ;; Null-Vectors are collinear with everything. Just ignore them.
       (apply almost= (map (fn [[x y]] (/ x y)) without-null))))
 
-(defn angle [v1 v2]
-    "returns the angle enclosed by two vectors in radians"
-    (.acos js/Math (/ (dot v1 v2)
-                      (* (length v1)
-                         (length v2)))))
+;; ;; this will always return the smallest possible angle
+;; (defn angle [v1 v2]
+;;     "returns the angle enclosed by two vectors in radians"
+;;     (.acos js/Math (/ (dot v1 v2)
+;;                       (* (length v1)
+;;                          (length v2)))))
+
+(defn angle [[ax ay] [bx by]]
+  "angle between two vectors in clockwise direction"
+  (let [t (- (atan2 ay ax)
+             (atan2 by bx))
+        circle (+ pi pi)]
+    (rem (+ t circle) circle))) ;; add full circle in case of negative angle
 
 ; Vector/Kreuzprodukt only exists for 3d Space by definition
 

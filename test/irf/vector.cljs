@@ -14,13 +14,20 @@
         (* rad (/ 360 (* 2 pi)))
         2))))
 
+(testing "quadrant"
+  (deftest quadrant
+    (is (= 1 (v/quadrant [12 34])))
+    (is (= 2 (v/quadrant [6 -3])))
+    (is (= 3 (v/quadrant [-5 -9])))
+    (is (= 4 (v/quadrant [-1 2])))))
+
 (testing "almost equal"
   (deftest almost-equal
     (is (= (v/almost= 100 101) false))
     (is (v/almost= 1))
     (is (v/almost= 1 1))
-    (is (v/almost= 1 1 1.0000001))
-    (is (v/almost= 10000001 10000002))))
+    (is (v/almost= 1 1 1.00000000001))
+    (is (v/almost= 100000000001 100000000002))))
 
 (testing "addition"
   (deftest add
@@ -77,10 +84,26 @@
 
 (testing "angle between two vectors"
   (deftest angle
+    (is (= (rad-to-deg (v/angle [0 1] [1 0]))
+           90))
+    (is (= (rad-to-deg (v/angle [1 1] [1 0]))
+           45))
+    (is (= (rad-to-deg (v/angle [1 0] [1 1]))
+           (- 360 45) 315))
+    (is (= (rad-to-deg (v/angle [1 1] [1 -1]))
+           90))
+    (is (= (rad-to-deg (v/angle [1 1] [-1 -1]))
+           180))
+    (is (= (rad-to-deg (v/angle [1 -1] [1 1]))
+           270))
+    (is (= (rad-to-deg (v/angle [-1 1] [1 1]))
+           90))
+    (is (= (rad-to-deg (v/angle [1 1] [-1 1]))
+           (- 360 90)))
     (is (= (rad-to-deg (v/angle [1 5] [3 7]))
            11.89))
     (is (= (rad-to-deg (v/angle [3 7] [1 5]))
-           11.89))))
+           (- 360 11.89)))))
 
 (testing "projection"
   (deftest project
