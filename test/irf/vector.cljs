@@ -122,12 +122,21 @@
              (v/v -1 -5))
            true))))
 
-(testing "intersection"
+(testing "intersection: intersect function"
   (deftest intersection
-    (is (v/v== (v/intersect (v/v 3 6) (v/v 2 -10) (v/v 2 -2) (v/v 4 6)) ; intersecting
+    (is (= (v/intersection (v/v 3 6) (v/v 2 -10) (v/v 2 -2) (v/v 4 6)) ; intersecting
                (v/v 4 1)))
-    (is (v/v== (v/intersect (v/v 2 2) (v/v 4 2) (v/v 2 -5) (v/v 1 4)) ; intersecting outside the vector
+    (is (= (v/intersection (v/v 2 2) (v/v 4 2) (v/v 2 -5) (v/v 1 4)) ; intersecting outside the vector
                (v/v 4 3)))
-    (is (v/v== (v/intersect (v/v 2 2) (v/v 5 1) (v/v 1 -1) (v/v -5 -1)) ; collinear
+    (is (= (v/intersection (v/v 2 2) (v/v 5 1) (v/v 1 -1) (v/v -5 -1)) ; collinear
                (v/v Infinity Infinity)))))
+
+(testing "intersection: intersects test"
+  (deftest intersects
+    (is (= (v/intersect? (v/v 3 6) (v/v 2 -10) (v/v 2 -2) (v/v 4 6)) ; intersecting
+           (v/v 4 1)))
+    (is (= (v/intersect? (v/v 2 2) (v/v 4 2) (v/v 2 -5) (v/v 1 4)) ; intersecting outside the vector
+           nil))
+    (is (= (v/intersect? (v/v 2 2) (v/v 5 1) (v/v 1 -1) (v/v -5 -1)) ; collinear
+           nil))))
 

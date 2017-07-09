@@ -106,17 +106,32 @@
 
 ; Vector/Kreuzprodukt only exists for 3d Space by definition
 
-(defn project [v1 v2]
+(defn project [a b]
     "returns the component parallel to a given vector"
-    (let [u (norm v2)]
-      (mult u (dot v1 u))))
+    (let [u (norm b)]
+      (mult u (dot a u))))
 
-(defn intersect [oa {ax :x ay :y} ob b]
-    "Class method: checks if two vectors are intersecting - returns intersection point"
-    (let [{cx :x cy :y}   (subtract ob oa)
+(defn intersection [pa {ax :x ay :y} pb b]
+    "Calculates the intersection point of two lines
+    defined by vectors a and b and their position vectors (pa and pb)."
+    (let [{cx :x cy :y}   (subtract pb pa)
           {-bx :x -by :y :as -b} (mult b -1)
           m (/ ay ax)
           mu (/ (- cy (* m cx))
                 (- -by (* m -bx)))]
-      (subtract ob (mult -b mu))))
+      (subtract pb (mult -b mu))))
+
+(defn intersect? [pa a pb b]
+  "return the intersection point (truthy) if the point lies on both a and b otherwise nil"
+  (let [x (intersection pa a pb b)
+        pa->x (subtract x pa)
+        pb->x (subtract x pb)]
+    (if (and (< (length-squared pa->x)
+                (length-squared a))
+             (= (quadrant pa->x) (quadrant a))
+             (< (length-squared pb->x)
+                (length-squared b))
+             (= (quadrant pb->x) (quadrant b)))
+    x
+    nil)))
 
