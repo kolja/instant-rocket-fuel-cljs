@@ -8,7 +8,6 @@
 
 (testing "poly creation"
   (deftest new-poly
-    (is (= 1 2))
     (is (= 2 2))))
 
 (testing "winding number"

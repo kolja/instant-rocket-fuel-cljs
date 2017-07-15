@@ -3,18 +3,16 @@
 ;vector.cljs
 ;by Kolja Wilcke in June 2017
 
-(defn v [x y]
-  "create a new Vector with x and y components"
-  {:x x :y y})
+(defrecord Vector [x y])
 
 (defn sqr [x] (js/Math.pow x 2))
 (def abs js/Math.abs)
 (def atan2 js/Math.atan2)
 (def pi (.-PI js/Math))
-(def v0 (v 0 0)) ;; null-vektor
+(def v0 (->Vector 0 0)) ;; null-vektor
 
 (defn quadrant [{:keys [x y]}]
-  "which quadrant does a vektor point to"
+  "which quadrant does a vector point to"
   (case [(pos? x) (pos? y)]
     [true true] 1
     [true false] 2
@@ -25,45 +23,44 @@
   "pitch angle (aka angle of climb/slope)"
   (/ y x))
 
-(defn almost= [& args]
+(defmulti almost= #(cond (number? %) :number
+                         (instance? irf.vector/Vector %) :vector))
+(defmethod almost= :number
+  [& args]
   "approximate equality for numbers"
   (let [mx (apply max args)
         mn (apply min args)
         e (/ (max (abs mn) (abs mx)) 1e10)]
     (< (- mx mn) e)))
 
-(defn v= [& args]
+(defmethod almost= :vector
+  [& args]
   "approximate equality for vectors"
   (and (apply almost= (map :x args))
        (apply almost= (map :y args))))
 
-(defn v== [& args]
-  "strict equality for vectors"
-  (and (apply = (map :x args))
-       (apply = (map :y args))))
-
 (defn add [& args]
   "Add Vectors"
   (reduce (fn [{x :x y :y} {acc-x :x acc-y :y}]
-            {:x (+ x acc-x)
-             :y (+ y acc-y)})
+            (->Vector (+ x acc-x)
+                      (+ y acc-y)))
           args))
 
 (defn subtract [{ax :x ay :y} & args]
   "Subtract Vectors"
   (let [{bx :x by :y} (apply add args)]
-    {:x (- ax bx)
-     :y (- ay by)}))
+    (->Vector (- ax bx)
+              (- ay by))))
 
 (defn mult [{:keys [x y]} n]
   "multiply the vector with a Number"
-  {:x (* n x)
-   :y (* n y)})
+  (->Vector (* n x)
+            (* n y)))
 
 (defn div [{:keys [x y]} n]
     "divide the vector with a Number"
-    {:x (/ x n)
-     :y (/ y n)})
+    (->Vector (/ x n)
+              (/ y n)))
 
 (defn length-squared [{:keys [x y]}]
     "return the length squared (for optimisation)"
@@ -76,7 +73,7 @@
 
 (defn norm [a]
     "returns the normalized vector (Length = 1)"
-    (if (v== a v0)
+    (if (= a v0)
       a
       (div a (length a))))
 
@@ -87,7 +84,7 @@
 
 (defn collinear? [& args]
     "determines if the given vectors are collinear"
-    (let [without-null (remove #(v== % v0) args)] ;; Null-Vectors are collinear with everything. Just ignore them.
+    (let [without-null (remove #(= % v0) args)] ;; Null-Vectors are collinear with everything. Just ignore them.
       (apply almost= (map (fn [{:keys [x y]}] (/ x y)) without-null))))
 
 ;; ;; this will always return the smallest possible angle

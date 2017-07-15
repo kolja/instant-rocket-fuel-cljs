@@ -2,5 +2,4 @@
 
 
 (defn winding-number [poly point]
-  
   )
