@@ -6,10 +6,14 @@
 
 (enable-console-print!)
 
-(testing "poly creation"
-  (deftest new-poly
-    (is (= 2 2))))
+(def p1 (mapv #(apply v/->Vector %) [[2 2] [2 8] [13 8] [7 2] [3 6] [8 6]]))
+(def x74 (v/->Vector 7 4))
+(def x55 (v/->Vector 5 5))
+(def x53 (v/->Vector 5 3))
 
 (testing "winding number"
   (deftest winding-number
-    (is (= true true))))
+    (is (odd? (p/winding-number p1 x74)))
+    (is (even? (p/winding-number p1 x55)))
+    (is (even? (p/winding-number p1 x53)))))
+

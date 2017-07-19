@@ -1,6 +1,6 @@
 (defproject irf "1.2.3"
   :dependencies [[org.clojure/clojure "1.8.0"]
-                 [org.clojure/clojurescript "1.9.562"]]
+                 [org.clojure/clojurescript "1.9.671"]]
   :plugins [[lein-cljsbuild "1.1.6"]
             [org.clojure/tools.reader "1.0.0"]
             [lein-figwheel "0.5.10"]

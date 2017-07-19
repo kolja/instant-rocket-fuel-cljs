@@ -9,6 +9,7 @@
 (def abs js/Math.abs)
 (def atan2 js/Math.atan2)
 (def pi (.-PI js/Math))
+(def tau (+ pi pi))
 (def v0 (->Vector 0 0)) ;; null-vektor
 
 (defn quadrant [{:keys [x y]}]
@@ -18,10 +19,6 @@
     [true false] 2
     [false false] 3
     [false true] 4))
-
-(defn pitch [{:keys [x y]}]
-  "pitch angle (aka angle of climb/slope)"
-  (/ y x))
 
 (defmulti almost= #(cond (number? %) :number
                          (instance? irf.vector/Vector %) :vector))
@@ -96,10 +93,11 @@
 
 (defn angle [{ax :x ay :y} {bx :x by :y}]
   "angle between two vectors in clockwise direction"
-  (let [t (- (atan2 ay ax)
-             (atan2 by bx))
-        circle (+ pi pi)]
-    (rem (+ t circle) circle))) ;; add full circle in case of negative angle
+  (let [angle (- (atan2 ay ax)
+                 (atan2 by bx))]
+    (+ angle (cond (< angle (- pi)) tau
+                   (> angle pi) (- tau)
+                   :else 0))))
 
 ; Vector/Kreuzprodukt only exists for 3d Space by definition
 
