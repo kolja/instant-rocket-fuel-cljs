@@ -34,9 +34,8 @@
    (v/->Vector (apply max (map :x polygon))
                (apply max (map :y polygon)))])
 
-(defn bb-intersect? [bb1 bb2]
+(defn bb-intersect? [[{a1x :x a1y :y} {a2x :x a2y :y}]
+                     [{b1x :x b1y :y} {b2x :x b2y :y}]]
   "do two bounding-boxes intersect?"
-  (not (or (<=(-> bb1 first :x) (-> bb1 second :x) (-> bb2 first :x) (-> bb2 second :x))
-           (<=(-> bb1 first :y) (-> bb1 second :y) (-> bb2 first :y) (-> bb2 second :y))
-           (<=(-> bb2 first :y) (-> bb2 second :y) (-> bb1 first :y) (-> bb1 second :y))
-           (<=(-> bb2 first :x) (-> bb2 second :x) (-> bb1 first :x) (-> bb1 second :x)))))
+  (not (or (<= a2x b1x) (<= a2y b1y)
+           (<= b2x a1x) (<= b2y a1y))))
