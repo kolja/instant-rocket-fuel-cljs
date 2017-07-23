@@ -4,6 +4,7 @@
 ;by Kolja Wilcke in June 2017
 
 (defrecord Vector [x y])
+(def v ->Vector)
 
 (defn sqr [x] (js/Math.pow x 2))
 (def abs js/Math.abs)
