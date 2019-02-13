@@ -85,12 +85,6 @@
     (let [without-null (remove #(= % v0) args)] ;; Null-Vectors are collinear with everything. Just ignore them.
       (apply almost= (map (fn [{:keys [x y]}] (/ x y)) without-null))))
 
-;; ;; this will always return the smallest possible angle
-;; (defn angle [v1 v2]
-;;     "returns the angle enclosed by two vectors in radians"
-;;     (.acos js/Math (/ (dot v1 v2)
-;;                       (* (length v1)
-;;                          (length v2)))))
 
 (defn angle [{ax :x ay :y} {bx :x by :y}]
   "angle between two vectors in clockwise direction"
